@@ -13,19 +13,20 @@ Key Skills Expected:
 Resume:
 {cv_text}
 
-Please evaluate and return only a valid JSON object like this:
+Please evaluate and respond ONLY with this JSON structure. No explanation, markdown, or code block. Just plain JSON.
+
 {{
-  "Score": 78,
-  "Skill Match Percentage": 85,
-  "Experience Years": "3.5",
-  "Top Strengths": "Fast learner, Python, Analytical thinking",
-  "Red Flags": "Short tenure in last role",
-  "Fit Justification": "Has all required skills and relevant experience.",
-  "Why Not Selected": "",
-  "Final Verdict": "Strong Fit",
-  "One Line Recommendation": "Should be hired for strong data science background.",
-  "Resume Summary": "MSc in Statistics, worked at TCS, Python, Pandas, Scikit-learn"
+  "Score": 0-100,
+  "Skill Match Percentage": 0-100,
+  "Experience Years": "string or number",
+  "Top Strengths": "text",
+  "Red Flags": "text",
+  "Fit Justification": "text",
+  "Why Not Selected": "text",
+  "Final Verdict": "Strong Fit / Moderate Fit / Not Recommended",
+  "One Line Recommendation": "text",
+  "Resume Summary": "education, companies, tools etc."
 }}
 
-Respond only with the JSON object.
+Strictly return only a valid JSON object.
 """
