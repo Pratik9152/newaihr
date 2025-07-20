@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 import tempfile
-import fitz
+import fitz  # PyMuPDF
 import pandas as pd
 import datetime
 import plotly.express as px
@@ -46,12 +46,27 @@ if process_button and job_description and uploaded_files:
             prompt = generate_prompt(cv_text, job_title, job_description, skill_map)
             ai_response = call_openrouter_api(prompt)
 
+            # Safe JSON parse with empty check
             try:
+                if not ai_response.strip():
+                    raise ValueError("Empty response from AI.")
                 result = json.loads(ai_response.strip())
             except Exception as e:
                 st.error(f"❌ Failed to parse AI response for: {name} — Error: {e}")
+                st.markdown("### 🧠 Raw AI Response:")
                 st.code(ai_response)
-                result = {}
+                result = {
+                    "Score": 0,
+                    "Final Verdict": "Parse Failed",
+                    "Skill Match Percentage": 0,
+                    "Experience Years": "N/A",
+                    "Top Strengths": "N/A",
+                    "Red Flags": "N/A",
+                    "Fit Justification": "N/A",
+                    "Why Not Selected": "N/A",
+                    "One Line Recommendation": "Response could not be parsed",
+                    "Resume Summary": "N/A"
+                }
 
             results.append({
                 "Candidate": name,
@@ -75,7 +90,7 @@ if process_button and job_description and uploaded_files:
 
             if filtered_df.empty:
                 filtered_df = df
-                st.warning("No candidates met the threshold. Showing all instead.")
+                st.warning("⚠️ No candidates met the threshold. Showing all instead.")
 
             best_df = df[df["Score"] == df["Score"].max()]
             st.success("✅ AI Analysis Complete")
