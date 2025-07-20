@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 import tempfile
-import fitz  # PyMuPDF
+import fitz
 import pandas as pd
 import datetime
 import plotly.express as px
@@ -11,7 +11,6 @@ from api import call_openrouter_api, trim_cv
 from parser import extract_pdf_text
 from analyzer import generate_prompt
 
-# Page Setup and Styles
 st.set_page_config(page_title="HR AI - Candidate Analyzer", layout="wide")
 
 with open("styles.css") as f:
@@ -19,21 +18,18 @@ with open("styles.css") as f:
 
 st.title("🧠 All-in-One AI HR Assistant")
 
-# Inputs
 job_title = st.text_input("🎯 Hiring For (Job Title / Role)")
 job_description = st.text_area("📌 Job Description or Role Requirements", height=200)
 custom_threshold = st.slider("📈 Minimum Fit Score Required", 0, 100, 50)
 uploaded_files = st.file_uploader("📁 Upload candidate CVs (PDF only)", type=["pdf"], accept_multiple_files=True)
 process_button = st.button("🚀 Analyze Candidates")
 
-# Predefined skills (extend as needed)
 skill_map = {
     "Data Scientist": ["Python", "Machine Learning", "Statistics", "Data Analysis"],
     "Frontend Developer": ["HTML", "CSS", "JavaScript", "React"],
     "HR Manager": ["Recruitment", "Onboarding", "HR Policies", "Employee Relations"],
 }
 
-# Processing Logic
 if process_button and job_description and uploaded_files:
     with st.spinner("🤖 AI analyzing candidates. Please wait..."):
         candidates = []
@@ -51,16 +47,16 @@ if process_button and job_description and uploaded_files:
             ai_response = call_openrouter_api(prompt)
 
             try:
-                result = json.loads(ai_response)
-            except Exception:
-                st.error(f"❌ Failed to parse AI response for: {name}")
+                result = json.loads(ai_response.strip())
+            except Exception as e:
+                st.error(f"❌ Failed to parse AI response for: {name} — Error: {e}")
                 st.code(ai_response)
                 result = {}
 
             results.append({
                 "Candidate": name,
                 "Score": result.get("Score", 0),
-                "Recommendation": result.get("Final Verdict", "N/A"),
+                "Recommendation": result.get("Final Verdict", "Unknown"),
                 "Skill Match %": result.get("Skill Match Percentage", 0),
                 "Experience (Years)": result.get("Experience Years", "N/A"),
                 "Top Strengths": result.get("Top Strengths", "N/A"),
@@ -76,12 +72,12 @@ if process_button and job_description and uploaded_files:
             df = pd.DataFrame(results)
             df["Score"] = pd.to_numeric(df["Score"], errors="coerce")
             filtered_df = df[df["Score"] >= custom_threshold]
-            best_df = df[df["Score"] == df["Score"].max()]
 
             if filtered_df.empty:
                 filtered_df = df
-                st.warning("⚠️ No candidates met the threshold. Showing all instead.")
+                st.warning("No candidates met the threshold. Showing all instead.")
 
+            best_df = df[df["Score"] == df["Score"].max()]
             st.success("✅ AI Analysis Complete")
             st.subheader("📊 Candidate Insights Dashboard")
             st.markdown(f"**🧑‍💼 {len(filtered_df)} candidates meet the criteria.**")
