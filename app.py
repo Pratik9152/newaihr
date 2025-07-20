@@ -5,26 +5,31 @@ import fitz  # PyMuPDF
 import pandas as pd
 import datetime
 import plotly.express as px
-from utils.api import call_openrouter_api, trim_cv
-from utils.parser import extract_pdf_text
-from utils.analyzer import generate_prompt, extract_number, extract_between
 
+from api import call_openrouter_api, trim_cv
+from parser import extract_pdf_text
+from analyzer import generate_prompt, extract_number, extract_between
+
+# Page Config and Custom CSS
 st.set_page_config(page_title="HR AI - Candidate Analyzer", layout="wide")
-st.markdown(open("utils/styles.css").read(), unsafe_allow_html=True)
+st.markdown(open("styles.css").read(), unsafe_allow_html=True)
 st.title("🧠 All-in-One AI HR Assistant")
 
+# Inputs
 job_title = st.text_input("🎯 Hiring For (Job Title / Role)")
 job_description = st.text_area("📌 Job Description or Role Requirements", height=200)
 custom_threshold = st.slider("📈 Minimum Fit Score Required", 0, 100, 50)
 uploaded_files = st.file_uploader("📁 Upload candidate CVs (PDF)", type=["pdf"], accept_multiple_files=True)
 process_button = st.button("🚀 Analyze Candidates")
 
+# Skills by role (customizable)
 skill_map = {
     "Data Scientist": ["Python", "Machine Learning", "Statistics", "Data Analysis"],
     "Frontend Developer": ["HTML", "CSS", "JavaScript", "React"],
     "HR Manager": ["Recruitment", "Onboarding", "HR Policies", "Employee Relations"],
 }
 
+# Main processing
 if process_button and job_description and uploaded_files:
     with st.spinner("🤖 AI analyzing candidates. Please wait..."):
         candidates = []
