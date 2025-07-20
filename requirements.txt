@@ -1,0 +1,13 @@
+streamlit
+pandas
+pytesseract
+PyMuPDF
+Pillow
+plotly
+requests
+numpy
+tqdm
+python-docx
+pdfminer.six
+fuzzywuzzy
+python-Levenshtein
